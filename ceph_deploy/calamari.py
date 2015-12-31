@@ -13,7 +13,7 @@ def distro_is_supported(distro_name):
     An enforcer of supported distros that can differ from what ceph-deploy
     supports.
     """
-    supported = ['centos', 'redhat', 'ubuntu', 'debian']
+    supported = ['centos', 'redhat', 'ubuntu', 'debian', 'arch']
     if distro_name in supported:
         return True
     return False

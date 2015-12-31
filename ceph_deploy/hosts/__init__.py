@@ -7,10 +7,13 @@ on the type of distribution/version we are dealing with.
 import logging
 from ceph_deploy import exc
 from ceph_deploy.util import versions
-from ceph_deploy.hosts import debian, centos, fedora, suse, remotes, rhel
+from ceph_deploy.hosts import debian, centos, fedora, suse, remotes, rhel, arch
 from ceph_deploy.connection import get_connection
 
 logger = logging.getLogger()
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s %(levelname)s# %(message)s",
+                    datefmt="%Y/%m/%d-%H:%M:%S")
 
 
 def get(hostname,
@@ -69,7 +72,7 @@ def get(hostname,
     module.is_el = module.normalized_name in ['redhat', 'centos', 'fedora', 'scientific']
     module.is_rpm = module.normalized_name in ['redhat', 'centos',
                                                'fedora', 'scientific', 'suse']
-    module.is_deb = not module.is_rpm
+    module.is_deb = module.normalized_name in ['debian', 'ubuntu', ]
     module.release = release
     module.codename = codename
     module.conn = conn
@@ -96,6 +99,7 @@ def _get_distro(distro, fallback=None, use_rhceph=False):
         'redhat': centos,
         'fedora': fedora,
         'suse': suse,
+        'arch': arch,
         }
 
     if distro == 'redhat' and use_rhceph:
@@ -116,6 +120,8 @@ def _normalized_distro_name(distro):
         return 'centos'
     elif distro.startswith('linuxmint'):
         return 'ubuntu'
+    elif distro.startswith('arch'):
+        return 'arch'
     return distro
 
 

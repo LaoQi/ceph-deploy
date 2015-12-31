@@ -308,3 +308,92 @@ class Zypper(PackageManager):
     def clean(self):
         cmd = self.executable + ['refresh']
         return self._run(cmd)
+
+
+class Pacman(PackageManager):
+    """
+    Apt package management
+    """
+
+    executable = [
+        'pacman',
+        '--noconfirm',
+        '--needed',
+    ]
+    name = 'pacman'
+
+    def install(self, packages, **kw):
+        if isinstance(packages, str):
+            packages = [packages]
+
+        extra_flags = kw.pop('extra_install_flags', None)
+        cmd = self.executable + [
+            '-S',
+        ]
+
+        if extra_flags:
+            if isinstance(extra_flags, str):
+                extra_flags = [extra_flags]
+            cmd.extend(extra_flags)
+        cmd.extend(packages)
+        return self._run(cmd)
+
+    def remove(self, packages, **kw):
+        if isinstance(packages, str):
+            packages = [packages]
+
+        extra_flags = kw.pop('extra_remove_flags', None)
+        cmd = self.executable + [
+            '-R',
+        ]
+        if extra_flags:
+            if isinstance(extra_flags, str):
+                extra_flags = [extra_flags]
+            cmd.extend(extra_flags)
+
+        cmd.extend(packages)
+        return self._run(cmd)
+
+    # def clean(self):
+    #     cmd = self.executable + ['update']
+    #     return self._run(cmd)
+
+    # def add_repo_gpg_key(self, url):
+    #     gpg_path = url.split('file://')[-1]
+    #     if not url.startswith('file://'):
+    #         cmd = ['wget', '-O', 'release.asc', url ]
+    #         self._run(cmd, stop_on_nonzero=False)
+    #     gpg_file = 'release.asc' if not url.startswith('file://') else gpg_path
+    #     cmd = ['apt-key', 'add', gpg_file]
+    #     self._run(cmd)
+
+    # def add_repo(self, name, url, **kw):
+    #     gpg_url = kw.pop('gpg_url', None)
+    #     if gpg_url:
+    #         self.add_repo_gpg_key(gpg_url)
+    #
+    #     safe_filename = '%s.list' % name.replace(' ', '-')
+    #     mode = 0644
+    #     if urlparse(url).password:
+    #         mode = 0600
+    #         self.remote_conn.logger.info(
+    #             "Creating repo file with mode 0600 due to presence of password"
+    #         )
+    #     self.remote_conn.remote_module.write_sources_list(
+    #         url,
+    #         self.remote_info.codename,
+    #         safe_filename,
+    #         mode
+    #     )
+
+        # Add package pinning for this repo
+        # fqdn = urlparse(url).hostname
+        # self.remote_conn.remote_module.set_apt_priority(fqdn)
+
+    # def remove_repo(self, name):
+    #     safe_filename = '%s.list' % name.replace(' ', '-')
+    #     filename = os.path.join(
+    #         '/etc/apt/sources.list.d',
+    #         safe_filename
+    #     )
+    #     self.remote_conn.remote_module.unlink(filename)

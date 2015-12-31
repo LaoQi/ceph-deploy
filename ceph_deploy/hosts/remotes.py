@@ -29,6 +29,12 @@ def platform_information(_linux_distribution=None):
             else:
                 codename = major
 
+    elif not distro:    # maybe archlinux
+        if os.path.exists('/etc/arch-release'):
+            distro = "arch"
+            codename = "Linux"
+            release = "release"
+
     return (
         str(distro).rstrip(),
         str(release).rstrip(),
